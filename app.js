@@ -8,11 +8,20 @@ app.set('view engine', 'ejs');
 // render the index page
 
 app.get('/', (req, res) => {
-  console.log('rendering index page');
   res.render('index');
+});
+
+// get with dinaamic route
+app.get('/details/:id', (req, res) => {
+  const id = req.params.id
+  if (id) {
+    res.render('details', {id});
+  } else {
+    res.render('index');
+  }
 });
 
 // start the server
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
-}
+  console.log(`Indekost app listening at http://localhost:${port}`);
+});
