@@ -23,5 +23,5 @@ app.get('/details/:id', (req, res) => {
 
 // start the server
 app.listen(port, () => {
-  console.log(`Indekost app listening at http://localhost:${port}`);
+  console.log(`indekost app listening at http://localhost:${port}`);
 });
