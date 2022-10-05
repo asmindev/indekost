@@ -1,2 +1,21 @@
-<% const title = "index" %> 
-<h1>ini <%= title %></h1>
+<body class="">
+  <%- include('layouts/nav') %> 
+  <div class="container">
+  <% const title = "index" %> 
+  <div class="col-md-8">
+  <h1>ini <%= title %></h1>
+  <h2 id="jam" class="fw-bold"></h2>
+  <form action="/upload" method="post" encType="multipart/form-data">
+    <label for="file" id="file">Masukkan File</label>
+    <input type="file" name="file" id="file">
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+  </div>
+  </div>
+  <script>
+      const jam = document.getElementById('jam');
+      setInterval(() => {
+        jam.innerText = new Date().toLocaleTimeString();
+      }, 1000);
+  </script>
+</body>
