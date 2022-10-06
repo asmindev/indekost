@@ -22,12 +22,34 @@ const userSchema = new Schema({
     minlength: 8,
     required: true,
   },
+  phone: {
+    type: String,
+    // required: true,
+  },
   created_at: Date,
 })
-// change _id to id 
+// change _id to id
 userSchema.virtual('id').get(function () {
   return this._id.toHexString()
 })
 
+const kostSchema = new Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  address: {
+    type: String,
+  },
+  price: {
+    type: Number,
+  },
+  photos: {
+    type: [{ url: String }],
+    required: true,
+  },
+})
+
+const Kost = mongoose.model('Kost', kostSchema)
 const User = mongoose.model('User', userSchema)
-export { User }
+export { User, Kost }

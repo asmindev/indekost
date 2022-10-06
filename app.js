@@ -4,7 +4,7 @@ import fileUpload from 'express-fileupload'
 import session from 'express-session'
 import cookieParser from 'cookie-parser'
 import './utils/database/db.js'
-import { User } from './utils/database/models.js'
+import { User, Kost } from './utils/database/models.js'
 const app = express()
 const store = new session.MemoryStore()
 const port = 3000
@@ -22,7 +22,7 @@ app.use(
   session({
     secret: 'secret',
     resave: true,
-    saveUninitialized: false,
+    saveUninitialized: true,
     store,
     cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 }, // 30 days
   })
@@ -30,15 +30,15 @@ app.use(
 
 // // render the index page
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
   if (req.session.loggedin) {
     const { user } = req.session
-    res.render('index', { title: 'Home', layout: 'layouts/main', user })
+    const kosts = await Kost.find()
+    res.render('index', { title: 'Home', layout: 'layouts/main', user, kosts })
   } else {
     res.redirect('/login')
   }
 })
-
 // register a new user
 app.post('/register', async (req, res) => {
   const { name, username, email, password } = req.body
@@ -58,7 +58,6 @@ app.post('/register', async (req, res) => {
 
 app.get('/register', async (req, res) => {
   //check if user is already logged in
-  console.log(req.session.loggedin)
   if (req.session.loggedin) {
     res.redirect('/')
   } else {
@@ -67,7 +66,8 @@ app.get('/register', async (req, res) => {
 })
 
 // login a user
-app.get('/login', (req, res) => {
+app.get('/login', async (req, res) => {
+  await Kost.deleteMany({})
   if (req.session.loggedin) {
     res.redirect('/')
   } else {
@@ -80,9 +80,10 @@ app.post('/login', async (req, res) => {
   if (user) {
     req.session.loggedin = true
     req.session.user = user
-    res.redirect(`${user.username}`)
+    res.json({ status: 'success', message: 'Login success' })
+    // res.redirect('/')
   } else {
-    res.json({ message: 'Invalid email or password' })
+    res.json({ status: 'error', message: 'Incorrect email or password' })
   }
 })
 
@@ -92,18 +93,34 @@ app.post('/login', async (req, res) => {
 // with the user's data
 
 // handle when upload file
-app.post('/upload', (req, res) => {
+app.post('/upload', async (req, res) => {
+  const nama = req.body.nama
+  const user = req.session.user
+  console.log(nama)
   const file = req.files.file
   const fileName = file.name
   const fileExtension = fileName.split('.').pop()
   const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif']
   if (allowedExtensions.includes(fileExtension)) {
-    file.mv(`public/uploads/${fileName}`, (err) => {
+    const url = `uploads/images/${fileName}`
+    file.mv(`public/uploads/images/${fileName}`, async (err) => {
       if (err) {
-        console.log(err)
         res.send(err)
       } else {
-        res.send('File uploaded!')
+        const kost = new Kost({
+          name: nama,
+          photos: [{ url }],
+        })
+        try {
+          await kost.save()
+          res.render('uploadSuccess', {
+            title: 'Upload Success',
+            layout: 'layouts/main',
+            user,
+          })
+        } catch (err) {
+          res.status(400).send(err)
+        }
       }
     })
   } else {
@@ -114,13 +131,17 @@ app.get('/logout', (req, res) => {
   req.session.destroy()
   res.redirect('/login')
 })
-app.get('/:username', async (req, res) => {
+app.get('/:username', async (req, res, next) => {
   const user = await User.findOne({ username: req.params.username })
   if (user) {
     res.render('profile', { title: 'Profile', layout: 'layouts/main', user })
   } else {
-    res.status(404).render('404', { title: '404', layout: 'layouts/main' })
+    next()
+    // res.status(404).render('404', { title: '404', layout: 'layouts/main' })
   }
+})
+app.use((req, res) => {
+  res.status(404).render('404', { title: '404', layout: 'layouts/main' })
 })
 
 // start the server
