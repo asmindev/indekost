@@ -1,23 +1,26 @@
-<form method="post" action="/register">
-  <table>
-    <tr>
-      <td>Nama:</td>
-      <td><input type="text" name="name" /></td>
-    </tr>
-    <tr>
-      <td>Username:</td>
-      <td><input type="text" name="username" /></td>
-    </tr>
-    <tr>
-      <td>Email:</td>
-      <td><input type="text" name="email" /></td>
-    </tr>
-    <tr>
-      <td>Password:</td>
-      <td><input type="password" name="password" /></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td><input type="submit" value="Register" /></td>
-    </tr>
-</form>
+<div class="container vh-100 d-flex justify-content-center align-items-center ">
+  <div>
+
+    <h1>REGISTER</h1>
+    <form method="post" action="/register" class="p-3 border rounded">
+      <div class="mb-2">
+        <label for="nama" class="form-label">Nama</label>
+        <input type="text" name="name" class="form-control" id="nama">
+      </div>
+      <div class="mb-2">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" class="form-control" id="username" name="username">
+      </div>
+      <div class="mb-2">
+        <label for="nama" class="form-label">Email</label>
+        <input type="email" class="form-control" id="nama" aria-describedby="emailHelp" name="email">
+      </div>
+      <div class="mb-2">
+      <label for="password" class="form-label">Password</label>
+      <input type="password" class="form-control" id="exampleInputPassword1" name="password">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>
+
+</div>

@@ -18,8 +18,7 @@ const userSchema = new Schema({
   },
   password: {
     type: String,
-    length: 8,
-    minlength: 8,
+    minlength: 4,
     required: true,
   },
   phone: {
