@@ -1,0 +1,39 @@
+<div class="container vh-100 d-flex align-items-center justify-content-center">
+  <div>
+  <div id="alert" hidden class="alert alert-danger" role="alert">
+</div>
+<form method="post" action="/login" class="border p-2 rounded">
+  <h1>Indekost</h1>
+  <div class="mb-3">
+    <label for="exampleInputEmail1" class="form-label">Email address</label>
+    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="email">
+    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+  </div>
+  <div class="mb-3">
+    <label for="exampleInputPassword1" class="form-label">Password</label>
+    <input type="password" class="form-control" id="exampleInputPassword1" name="password">
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+</div>
+</div>
+<script>
+    const form = document.querySelector('form');
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const response = await fetch(form.action, {
+            method: form.method,
+            body: formData
+        });
+        const body = await response.json();
+        if (body.status === 'success') {
+            window.location.href = '/';
+        } else {
+            const alert = document.querySelector('#alert');
+            // set hidden to false 
+            alert.hidden = false;
+            alert.innerText = body.message;
+        }
+    });
+</script>
