@@ -1,0 +1,30 @@
+<%- include('layouts/nav') %> 
+<div class="p-3">
+      <h1>Tambah Data</h1>
+      <form
+        class="rounded p-2 border"
+        action="/upload"
+        method="post"
+        enctype="multipart/form-data"
+      >
+        <div class="mb-2">
+          <label for="nama" class="form-label">Nama</label>
+          <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan Nama kost"/>
+        </div>
+        <div class="mb-2">
+          <label for="alamat" class="form-label">Alamat</label>
+          <input type="text" class="form-control" id="alamat" name="alamat" placeholder="Masukkan alamat" />
+        </div>
+
+        <div class="mb-2">
+          <label for="phone" class="form-label">Telepon</label>
+          <input type="number" class="form-control" id="phone" name="phone" placeholder="08xxxxxxx" />
+        </div>
+        <div class="mb-2">
+          <label for="file" class="form-label">Photo</label>
+          <input type="file" class="form-control" id="file" name="file" accept="image/*" />
+        </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>

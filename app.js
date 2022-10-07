@@ -5,6 +5,7 @@ import session from 'express-session'
 import cookieParser from 'cookie-parser'
 import './utils/database/db.js'
 import { User, Kost } from './utils/database/models.js'
+
 const app = express()
 const store = new session.MemoryStore()
 const port = 3000
@@ -27,6 +28,11 @@ app.use(
     cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 }, // 30 days
   })
 )
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  res.setHeader('Pragma', 'no-cache');
+  next();
+});
 
 // // render the index page
 
@@ -34,14 +40,18 @@ app.get('/', async (req, res) => {
   if (req.session.loggedin) {
     const { user } = req.session
     const kosts = await Kost.find()
-    res.render('index', { title: 'Home', layout: 'layouts/main', user, kosts })
+    res.render('index', {
+      title: 'Home', layout: 'layouts/main', user, kosts
+    })
   } else {
     res.redirect('/login')
   }
 })
 // register a new user
 app.post('/register', async (req, res) => {
-  const { name, username, email, password } = req.body
+  const {
+    name, username, email, password
+  } = req.body
   const user = new User({
     name,
     username,
@@ -57,7 +67,7 @@ app.post('/register', async (req, res) => {
 })
 
 app.get('/register', async (req, res) => {
-  //check if user is already logged in
+  // check if user is already logged in
   if (req.session.loggedin) {
     res.redirect('/')
   } else {
@@ -87,17 +97,11 @@ app.post('/login', async (req, res) => {
   }
 })
 
-// profile page
-// get the user's profile
-// and render the profile page
-// with the user's data
-
 // handle when upload file
 app.post('/upload', async (req, res) => {
-  const nama = req.body.nama
-  const user = req.session.user
-  console.log(nama)
-  const file = req.files.file
+  const { nama, alamat, phone } = req.body
+  const { user } = req.session
+  const { file } = req.files
   const fileName = file.name
   const fileExtension = fileName.split('.').pop()
   const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif']
@@ -105,10 +109,12 @@ app.post('/upload', async (req, res) => {
     const url = `uploads/images/${fileName}`
     file.mv(`public/uploads/images/${fileName}`, async (err) => {
       if (err) {
-        res.send(err)
+        res.json({ status: 'error', message: 'Failed to upload file' })
       } else {
         const kost = new Kost({
           name: nama,
+          address: alamat,
+          phone,
           photos: [{ url }],
         })
         try {
@@ -118,18 +124,23 @@ app.post('/upload', async (req, res) => {
             layout: 'layouts/main',
             user,
           })
-        } catch (err) {
-          res.status(400).send(err)
+        } catch (error) {
+          res.status(400).json({ status: 'error', message: error })
         }
       }
     })
   } else {
-    res.send('File extension not allowed!')
+    res.status(400).json({ status: 'error', message: 'Invalid file type' })
   }
 })
 app.get('/logout', (req, res) => {
   req.session.destroy()
-  res.redirect('/login')
+  res.status(200).json({ status: 'success', message: 'Logout success' })
+  // res.redirect('/login')
+})
+app.get('/add', async (req, res) => {
+  const { user } = req.session
+  res.render('add', { title: 'Add', layout: 'layouts/main', user })
 })
 app.get('/:username', async (req, res, next) => {
   const user = await User.findOne({ username: req.params.username })
